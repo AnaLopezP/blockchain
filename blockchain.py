@@ -93,6 +93,13 @@ def mine_block():
     blockchain.add_block(new_block)
     return jsonify({'message':'Block minado correctamente'})
 
+@app.route('/chain_status', methods=['GET'])
+def chain_status():
+    is_valid = blockchain.is_chain_valid()
+    status_message = "Válida" if is_valid else "Inválida"
+    return jsonify({'status': status_message})
+
+
 #ejemplo
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
