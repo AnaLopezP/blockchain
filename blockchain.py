@@ -1,54 +1,65 @@
-import hashlib
+import hashlib #librería para funciones hash
 import datetime
 
 class Block:
+    #Esta clase representa un bloque de la cadena de bloques
     def __init__(self, index, timestamp, data, previous_hash):
-        self.index = index
-        self.timestamp = timestamp
-        self.data = data
-        self.previous_hash = previous_hash
-        self.hash = self.calculate_hash()
-        self.nonce = 0
+        self.index = index #índice del bloque en la cadena
+        self.timestamp = timestamp #marca de tiempo
+        self.data = data #datos del bloque
+        self.previous_hash = previous_hash #hash del bloque anterior
+        self.hash = self.calculate_hash() #hash del bloque actual
+        self.nonce = 0 #número aleatorio para minar el bloque
 
     def calculate_hash(self):
-        sha = hashlib.sha256()
+        #Calcula el hash del bloque
+        sha = hashlib.sha256() #crea un objeto hash
+        #actualiza el hash con los datos del bloque
         sha.update(str(self.index).encode('utf-8') +
                   str(self.timestamp).encode('utf-8') +
                   str(self.data).encode('utf-8') +
                   str(self.previous_hash).encode('utf-8') +
                   str(self.nonce).encode('utf-8'))
-        return sha.hexdigest()
+        return sha.hexdigest() #devuelve el hash en formato hexadecimal
     
     def mine_block(self, difficulty):
-        while self.hash[:difficulty] != "0" * difficulty:
-            self.nonce += 1
+        #Realiza la minería del bloque y encuentra el hash correcto
+        while self.hash[:difficulty] != "0" * difficulty: #verifica si el hash del bloque comienza con ceros
+            self.nonce += 1 #incrementa el nonce
             self.hash = self.calculate_hash()
         print("Block mined: " + self.hash)
 
 class Blockchain:
+    #clase que representa la cadena de bloques
     def __init__(self):
-        self.chain = [self.create_genesis_block()]
-        self.difficulty = 4
+        self.chain = [self.create_genesis_block()] #lista de bloques
+        self.difficulty = 4 #dificultad para minar bloques
 
     def create_genesis_block(self):
+        #crea el bloque génesis
         return Block(0, datetime.datetime.now(), "Genesis Block", "0")
 
     def get_latest_block(self):
+        #devuelve el último bloque de la cadena
         return self.chain[-1]
 
     def add_block(self, new_block):
-        new_block.previous_hash = self.get_latest_block().hash
-        new_block.mine_block(self.difficulty)
-        self.chain.append(new_block)
+        #añade un nuevo bloque a la cadena
+        new_block.previous_hash = self.get_latest_block().hash #asigna el hash del último bloque como hash anterior
+        new_block.mine_block(self.difficulty) #mina el bloque
+        self.chain.append(new_block) #añade el bloque a la cadena
 
     def is_chain_valid(self):
+        #verifica si la cadena de bloques es válida
         for i in range(1, len(self.chain)):
-            current_block = self.chain[i]
-            previous_block = self.chain[i - 1]
+            current_block = self.chain[i] #bloque actual
+            previous_block = self.chain[i - 1] #bloque anterior
 
+            #verifica si el hash del bloque actual es correcto
             if current_block.hash != current_block.calculate_hash():
                 return False
 
+            #verifica si el hash del bloque anterior es correcto
             if current_block.previous_hash != previous_block.hash:
                 return False
 
@@ -56,9 +67,13 @@ class Blockchain:
     
 #ejemplo
 if __name__ == '__main__':
-    blockchain = Blockchain()
+    blockchain = Blockchain() #crea una cadena de bloques
+    
+    #añade bloques a la cadena
     print("Mining block 1...")
     blockchain.add_block(Block(1, datetime.datetime.now(), "Amount: 4", ""))
     print("Mining block 2...")
     blockchain.add_block(Block(2, datetime.datetime.now(), "Amount: 10", ""))
+    
+    #verifica si la cadena es válida
     print('Es la cadena valida?:', blockchain.is_chain_valid())
