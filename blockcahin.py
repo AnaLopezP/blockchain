@@ -36,7 +36,7 @@ class Blockchain:
             return False
         
         # Comprobamos si el bloque es válido
-        if not Blockchain.is_valid_proof(block, proof):
+        if not Blockchain.is_valid_proof(self, block, proof):
             return False
         
         block.hash = proof
@@ -75,4 +75,11 @@ if __name__ == '__main__':
 
     # Añadimos el bloque a la cadena
     my_blockchain.add_block(new_block, proof)
-                  
+    print("Block added to the blockchain")
+    print("Hash: ", new_block.hash)
+    print("Nonce: ", new_block.nonce)
+    print("Index: ", new_block.index)
+    print("Timestamp: ", new_block.timestamp)
+    print("Transactions: ", new_block.transactions)
+    print("Previous hash: ", new_block.previous_hash)
+    print("¿Es válido?: " + str(my_blockchain.is_valid_proof(new_block, proof)))               
