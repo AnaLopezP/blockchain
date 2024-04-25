@@ -60,18 +60,19 @@ class Blockchain:
         return computed_hash
     
 # EJECUTAR EL PROGRAMA
-# Creamos una instancia de la clase Blockchain
-my_blockchain = Blockchain()
+if __name__ == '__main__':
+    # Creamos una instancia de la clase Blockchain
+    my_blockchain = Blockchain()
 
-# Crear un nuevo bloque con algunas transacciones
-new_block = Block(index = len(my_blockchain.chain),
-                  timestamp = time.time(),
-                  transactions = ["Transaccion 1", "Transaccion 2"],
-                  previous_hash= my_blockchain.chain[-1].hash)
+    # Crear un nuevo bloque con algunas transacciones
+    new_block = Block(index = len(my_blockchain.chain),
+                    timestamp = time.time(),
+                    transactions = ["Transaccion 1", "Transaccion 2"],
+                    previous_hash= my_blockchain.chain[-1].hash)
 
-# Realizamos la prueba de trabajo
-proof = my_blockchain.proof_of_work(new_block)
+    # Realizamos la prueba de trabajo
+    proof = my_blockchain.proof_of_work(new_block)
 
-# Añadimos el bloque a la cadena
-my_blockchain.add_block(new_block, proof)
+    # Añadimos el bloque a la cadena
+    my_blockchain.add_block(new_block, proof)
                   
