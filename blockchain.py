@@ -1,6 +1,8 @@
 import hashlib #librería para funciones hash
 import datetime
+from flask import Flask, jsonify, request
 
+app = Flask(__name__)
 class Block:
     #Esta clase representa un bloque de la cadena de bloques
     def __init__(self, index, timestamp, data, previous_hash):
@@ -65,16 +67,32 @@ class Blockchain:
                 return False
 
         return True
-    
+
+blockchain = Blockchain() #crea una cadena de bloques
+@app.route('/')
+def index():
+    return "Blockchain"
+
+@app.route('/blocks', methods=['GET'])
+def get_bloacks():
+    blocks=[]
+    for block in blockchain.chain:
+        blocks.append({
+            'index':block.index,
+            'timestamp':block.timestamp,
+            'data':block.data,
+            'previous_hash':block.previous_hash,
+            'hash':block.hash
+        })
+    return jsonify({'blocks':blocks})
+
+@app.route('/mine_block', methods=['POST'])
+def mine_block():
+    data = request.get_json()
+    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
+    blockchain.add_block(new_block)
+    return jsonify({'message':'Block minado correctamente'})
+
 #ejemplo
 if __name__ == '__main__':
-    blockchain = Blockchain() #crea una cadena de bloques
-    
-    #añade bloques a la cadena
-    print("Mining block 1...")
-    blockchain.add_block(Block(1, datetime.datetime.now(), "Amount: 4", ""))
-    print("Mining block 2...")
-    blockchain.add_block(Block(2, datetime.datetime.now(), "Amount: 10", ""))
-    
-    #verifica si la cadena es válida
-    print('Es la cadena valida?:', blockchain.is_chain_valid())
+    app.run(debug=True, port=5000)
