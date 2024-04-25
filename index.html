@@ -72,6 +72,16 @@
             background-color: #45a049;
         }
     </style>
+<h2>Enviar Transacción:</h2>
+<form id="transactionForm">
+    <label for="transactionData">Datos de la Transacción:</label>
+    <input type="text" id="transactionData" name="transactionData" required>
+    <button type="submit">Enviar Transacción</button>
+</form>
+
+<h2>Transacciones Pendientes:</h2>
+<ul id="pendingTransactions"></ul>
+
 </head>
 <body>
     <div class="container">
@@ -126,6 +136,37 @@
                 const chainStatus = document.getElementById('chainStatus');
                 chainStatus.textContent = `Estado de la Cadena: ${data.status}`;
             });
+
+            document.getElementById('transactionForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                fetch('/send_transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        data: formData.get('transactionData')
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.reload();
+                });
+            });
+            
+            fetch('/pending_transactions')
+                .then(response => response.json())
+                .then(data => {
+                    const pendingTransactionsList = document.getElementById('pendingTransactions');
+                    data.transactions.forEach(transaction => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Datos: ${transaction}`;
+                        pendingTransactionsList.appendChild(listItem);
+                    });
+                });
+            
     </script>
 </body>
 </html>

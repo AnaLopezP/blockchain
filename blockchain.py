@@ -37,6 +37,7 @@ class Blockchain:
     def __init__(self):
         self.chain = [self.create_genesis_block()] #lista de bloques
         self.difficulty = 4 #dificultad para minar bloques
+        self.pending_transactions = [] #transacciones pendientes
 
     def create_genesis_block(self):
         #crea el bloque génesis
@@ -67,6 +68,17 @@ class Blockchain:
                 return False
 
         return True
+    
+    def add_transaction(self, data):
+        #añade una transacción pendiente a la lista
+        self.pending_transactions.append(data)
+        
+    def mine_block(self, miner_reward_address):
+        #mina un bloque con las transacciones pendientes
+        new_block = Block(len(self.chain), datetime.datetime.now(), self.pending_transactions, self.get_latest_block().hash)
+        new_block.mine_block(self.difficulty)
+        self.chain.append(new_block)
+        self.pending_transactions = [] #vacía la lista de transacciones pendientes
 
 blockchain = Blockchain() #crea una cadena de bloques
 @app.route('/')
@@ -99,6 +111,12 @@ def chain_status():
     status_message = "Válida" if is_valid else "Inválida"
     return jsonify({'status': status_message})
 
+@app.route('/send_transaction', methods=['POST'])
+def send_transaction():
+    data = request.get_json()
+    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
+    blockchain.add_block(new_block)
+    return jsonify({'message':'Transacción enviada correctamente'})
 
 #ejemplo
 if __name__ == '__main__':
