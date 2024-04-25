@@ -72,15 +72,6 @@
             background-color: #45a049;
         }
     </style>
-<h2>Enviar Transacción:</h2>
-<form id="transactionForm">
-    <label for="transactionData">Datos de la Transacción:</label>
-    <input type="text" id="transactionData" name="transactionData" required>
-    <button type="submit">Enviar Transacción</button>
-</form>
-
-<h2>Transacciones Pendientes:</h2>
-<ul id="pendingTransactions"></ul>
 
 </head>
 <body>
@@ -97,6 +88,14 @@
         <h2>Estado de la Cadena:</h2>
         <p id="chainStatus"></p>
     </div>
+
+    <div class="container">
+        <h2>Enviar Transacción:</h2>
+        <form id="transactionForm">
+            <label for="transactionData">Datos:</label>
+            <input type="text" id="transactionData" name="transactionData" required>
+            <button type="submit">Enviar Transacción</button>
+        </form>
 
     <script>
         fetch('/blocks')

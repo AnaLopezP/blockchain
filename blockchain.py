@@ -73,7 +73,7 @@ class Blockchain:
         #añade una transacción pendiente a la lista
         self.pending_transactions.append(data)
         
-    def mine_block(self, miner_reward_address):
+    def mine_block(self):
         #mina un bloque con las transacciones pendientes
         new_block = Block(len(self.chain), datetime.datetime.now(), self.pending_transactions, self.get_latest_block().hash)
         new_block.mine_block(self.difficulty)
