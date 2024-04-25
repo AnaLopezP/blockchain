@@ -1,8 +1,8 @@
 import hashlib #librería para funciones hash
 import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 class Block:
     #Esta clase representa un bloque de la cadena de bloques
     def __init__(self, index, timestamp, data, previous_hash):
@@ -71,7 +71,7 @@ class Blockchain:
 blockchain = Blockchain() #crea una cadena de bloques
 @app.route('/')
 def index():
-    return "Blockchain"
+    return render_template('index.html')
 
 @app.route('/blocks', methods=['GET'])
 def get_bloacks():

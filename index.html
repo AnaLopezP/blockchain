@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain</title>
+</head>
+<body>
+    <h1>Bienvenido a la Blockchain</h1>
+    <h2>Últimos Bloques:</h2>
+    <ul id="blocks"></ul>
+    <h2>Minar Nuevo Bloque:</h2>
+    <form id="mineForm">
+        <label for="data">Datos:</label>
+        <input type="text" id="data" name="data" required>
+        <button type="submit">Minar Bloque</button>
+    </form>
+
+    <script>
+        fetch('/blocks')
+            .then(response => response.json())
+            .then(data => {
+                const blocks = data.blocks;
+                const blocksList = document.getElementById('blocks');
+                blocks.forEach(block => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Índice: ${block.index}, Timestamp: ${block.timestamp}, Datos: ${block.data}, Hash: ${block.hash}`;
+                    blocksList.appendChild(listItem);
+                });
+            });
+
+        document.getElementById('mineForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/mine_block', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    data: formData.get('data')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            });
+        });
+    </script>
+</body>
+</html>
