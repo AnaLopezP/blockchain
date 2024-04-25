@@ -8,8 +8,9 @@ class Block:
         self.timestamp = timestamp #marca de tiempo
         self.data = data #datos del bloque
         self.previous_hash = previous_hash #hash del bloque anterior
+        self.nonce = 0 #número de operaciones de prueba de trabajo
         self.hash = self.calculate_hash() #hash del bloque actual
-        self.nonce = 0 #número aleatorio para minar el bloque
+        
 
     def calculate_hash(self):
         #Calcula el hash del bloque
