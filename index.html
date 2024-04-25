@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,28 +75,40 @@
     </style>
 
 </head>
+
 <body>
     <div class="container">
-        <h1>Bienvenido a la Blockchain</h1>
-        <h2>Últimos Bloques:</h2>
+        <h1>Welcome to the Blockchain</h1>
+        <h2>Latest Blocks:</h2>
         <ul id="blocks"></ul>
-        <h2>Minar Nuevo Bloque:</h2>
+        <h2>Mine New Block:</h2>
         <form id="mineForm">
-            <label for="data">Datos:</label>
+            <label for="data">Data:</label>
             <input type="text" id="data" name="data" required>
-            <button type="submit">Minar Bloque</button>
+            <button type="submit">Mine Block</button>
         </form>
-        <h2>Estado de la Cadena:</h2>
+        <h2>Chain Status:</h2>
         <p id="chainStatus"></p>
     </div>
 
     <div class="container">
-        <h2>Enviar Transacción:</h2>
+        <h2>Send Transaction:</h2>
         <form id="transactionForm">
-            <label for="transactionData">Datos:</label>
+            <label for="transactionData">Data:</label>
             <input type="text" id="transactionData" name="transactionData" required>
-            <button type="submit">Enviar Transacción</button>
+            <button type="submit">Send Transaction</button>
         </form>
+    </div>
+
+    <div class="container">
+        <h2>Block Details:</h2>
+        <form id="blockDetailsForm">
+            <label for="blockIndex">Block Index:</label>
+            <input type="number" id="blockIndex" name="blockIndex" min="0" required>
+            <button type="submit">Get Block Details</button>
+        </form>
+        <div id="blockDetails"></div>
+    </div>
 
     <script>
         fetch('/blocks')
@@ -105,41 +118,41 @@
                 const blocksList = document.getElementById('blocks');
                 blocks.forEach(block => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = `Índice: ${block.index}, Timestamp: ${block.timestamp}, Datos: ${block.data}, Hash: ${block.hash}`;
+                    listItem.textContent = `Index: ${block.index}, Timestamp: ${block.timestamp}, Data: ${block.data}, Hash: ${block.hash}`;
                     blocksList.appendChild(listItem);
                 });
             });
 
-        document.getElementById('mineForm').addEventListener('submit', function(event) {
+        document.getElementById('mineForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(this);
             fetch('/mine_block', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    data: formData.get('data')
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        data: formData.get('data')
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                window.location.reload();
-            });
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.reload();
+                });
         });
 
         fetch('/chain_status')
             .then(response => response.json())
             .then(data => {
                 const chainStatus = document.getElementById('chainStatus');
-                chainStatus.textContent = `Estado de la Cadena: ${data.status}`;
+                chainStatus.textContent = `Chain Status: ${data.status}`;
             });
 
-            document.getElementById('transactionForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const formData = new FormData(this);
-                fetch('/send_transaction', {
+        document.getElementById('transactionForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/send_transaction', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -153,19 +166,34 @@
                     alert(data.message);
                     window.location.reload();
                 });
-            });
-            
-            fetch('/pending_transactions')
-                .then(response => response.json())
+        });
+
+        document.getElementById('blockDetailsForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch(`/block/${formData.get('blockIndex')}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Block not found');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    const pendingTransactionsList = document.getElementById('pendingTransactions');
-                    data.transactions.forEach(transaction => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `Datos: ${transaction}`;
-                        pendingTransactionsList.appendChild(listItem);
-                    });
+                    const blockDetails = document.getElementById('blockDetails');
+                    blockDetails.innerHTML = `
+                        <p>Index: ${data.block.index}</p>
+                        <p>Timestamp: ${data.block.timestamp}</p>
+                        <p>Data: ${data.block.data}</p>
+                        <p>Previous Hash: ${data.block.previous_hash}</p>
+                        <p>Hash: ${data.block.hash}</p>
+                    `;
+                })
+                .catch(error => {
+                    const blockDetails = document.getElementById('blockDetails');
+                    blockDetails.innerHTML = `<p>${error.message}</p>`;
                 });
-            
+        });
     </script>
 </body>
+
 </html>
