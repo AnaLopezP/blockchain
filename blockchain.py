@@ -144,11 +144,22 @@ def chain_status():
     return jsonify({'status': status_message})
 
 
-@app.route('/send_transaction', methods=['POST'])
-def send_transaction():
+
+@app.route('/transaction_block', methods=['POST'])
+def mine_block():
     data = request.get_json()
-    blockchain.add_transaction(data['data'])
-    return jsonify({'message': 'Transaction added to pending transactions'})
+    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
+    blockchain.add_block(new_block)
+    return jsonify({'message': 'Transaction sent successfully'})
+
+
+
+@app.route('/diplom_block', methods=['POST'])
+def mine_block():
+    data = request.get_json()
+    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
+    blockchain.add_block(new_block)
+    return jsonify({'message': 'Diplom sent successfully'})
 
 
 if __name__ == '__main__':

@@ -152,13 +152,32 @@
         document.getElementById('transactionForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(this);
-            fetch('/send_transaction', {
+            fetch('/transaciton_block', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         data: formData.get('transactionData')
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.reload();
+                });
+        });
+
+        document.getElementById('diplomForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/diplom_block', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        data: formData.get('data')
                     })
                 })
                 .then(response => response.json())
