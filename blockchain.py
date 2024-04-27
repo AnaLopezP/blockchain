@@ -175,14 +175,19 @@ def mine_pending_transactions():
     blockchain.mine_pending_transactions()
     return jsonify({'message': 'Pending transactions mined successfully'})
 
-
-
 @app.route('/diplom_block', methods=['POST'])
 def diplom_block():
     data = request.get_json()
-    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
-    blockchain.add_block(new_block)
-    return jsonify({'message': 'Diplom sent successfully'})
+    sender = data.get('sender')
+    recipient = data.get('recipient')
+    message = data.get('message')
+    if sender is None or recipient is None or message is None:
+        return jsonify({'message': 'Invalid transaction data'}), 400
+
+    blockchain.add_transaction(sender, recipient, message)
+    blockchain.mine_pending_transactions()  # Llama al método para minar bloques pendientes
+    return jsonify({'message': 'Transaction added successfully and block mined'}), 201
+
 
 
 if __name__ == '__main__':

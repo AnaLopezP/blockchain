@@ -197,26 +197,36 @@
         });
             
             
-
         document.getElementById('diplomForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            const formData = new FormData(this);
+            const sender = document.getElementById('sender').value;
+            const recipient = document.getElementById('recipient').value;
+            const message = document.getElementById('message').value;
+        
+            // Verificar si los campos no están vacíos
+            if(sender.trim() === '' || recipient.trim() === '' || message.trim() === '') {
+                alert('Please fill out all fields.');
+                return;
+            }
+        
             fetch('/diplom_block', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        data: formData.get('diplomaData')
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sender: sender,
+                    recipient: recipient,
+                    message: message
                 })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    window.location.reload();
-                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            });
         });
-
+        
         document.getElementById('blockDetailsForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(this);
