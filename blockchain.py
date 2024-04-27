@@ -176,6 +176,7 @@ def mine_pending_transactions():
     return jsonify({'message': 'Pending transactions mined successfully'})
 
 
+
 @app.route('/diplom_block', methods=['POST'])
 def diplom_block():
     data = request.get_json()

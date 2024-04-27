@@ -84,7 +84,7 @@
         <h2>Mine New Block:</h2>
         <form id="mineForm">
             <label for="data">Data:</label>
-            <input type="text" id="data" name="data" required>
+            <textarea id="blockData" name="blockData" rows="4" cols="50" required></textarea><br>
             <button type="submit">Mine Block</button>
         </form>
     </div>
@@ -107,7 +107,7 @@
         <h2>Send Diplom:</h2>
         <form id="diplomForm">
             <label for="data">Data:</label>
-            <input type="text" id="data" name="data" required>
+            <textarea id="diplomaData" name="diplomaData" rows="4" cols="50" required></textarea><br>
             <button type="submit">Send Diplom</button>
         </form>
     </div>
@@ -125,7 +125,7 @@
     <div class="container">
         <h2>Chain Status:</h2>
         <p id="chainStatus"></p>
-    </div>
+        
 
     <script>
         fetch('/blocks')
@@ -149,7 +149,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        data: formData.get('data')
+                        data: formData.get('blockData')
                     })
                 })
                 .then(response => response.json())
@@ -207,7 +207,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        data: formData.get('data')
+                        data: formData.get('diplomaData')
                     })
                 })
                 .then(response => response.json())
