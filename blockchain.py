@@ -154,6 +154,7 @@ def transaction_block():
 
 
 
+
 @app.route('/diplom_block', methods=['POST'])
 def diplom_block():
     data = request.get_json()
