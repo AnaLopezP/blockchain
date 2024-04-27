@@ -146,7 +146,7 @@ def chain_status():
 
 
 @app.route('/transaction_block', methods=['POST'])
-def mine_block():
+def transaction_block():
     data = request.get_json()
     new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
     blockchain.add_block(new_block)
@@ -155,7 +155,7 @@ def mine_block():
 
 
 @app.route('/diplom_block', methods=['POST'])
-def mine_block():
+def diplom_block():
     data = request.get_json()
     new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
     blockchain.add_block(new_block)
