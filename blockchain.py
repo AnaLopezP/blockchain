@@ -83,19 +83,22 @@ class Blockchain:
 
     
     def add_transaction(self, sender, recipient, message):
-        self.pending_transactions.append({
-            'sender': sender,
-            'recipient': recipient,
-            'message': message
-        })
+        # Validar que los campos no estén vacíos
+        if sender.strip() and recipient.strip() and message.strip():
+            self.pending_transactions.append({
+                'sender': sender,
+                'recipient': recipient,
+                'message': message
+            })
 
     def add_diploma(self, sender, recipient, diploma_name):
-        # Añade un envío de diploma pendiente a la lista
-        self.pending_diplomas.append({
-            'sender': sender,
-            'recipient': recipient,
-            'diploma_name': diploma_name
-        })
+        # Validar que los campos no estén vacíos
+        if sender.strip() and recipient.strip() and diploma_name.strip():
+            self.pending_diplomas.append({
+                'sender': sender,
+                'recipient': recipient,
+                'diploma_name': diploma_name
+            })
 
     def mine_pending_transactions(self):
         if len(self.pending_transactions) > 0 or len(self.pending_diplomas) > 0:
