@@ -33,7 +33,16 @@ class Block:
             self.hash = self.calculate_hash()
         print("Block mined: " + self.hash)
 
-
+    def to_dict(self):
+        return {
+            'index': self.index,
+            'timestamp': str(self.timestamp),  # Convertir a cadena para serialización
+            'data': self.data,
+            'previous_hash': self.previous_hash,
+            'hash': self.hash
+        }
+        
+        
 class Blockchain:
     # clase que representa la cadena de bloques
     def __init__(self):
@@ -71,17 +80,24 @@ class Blockchain:
 
         return True
 
-    def add_transaction(self, data):
-        # añade una transacción pendiente a la lista
-        self.pending_transactions.append(data)
+    
+    def add_transaction(self, sender, recipient, message):
+        self.pending_transactions.append({
+            'sender': sender,
+            'recipient': recipient,
+            'message': message
+        })
 
-    def mine_block(self):
-        # mina un bloque con las transacciones pendientes
-        new_block = Block(len(self.chain), datetime.datetime.now(), self.pending_transactions,
-                          self.get_latest_block().hash)
-        new_block.mine_block(self.difficulty)
-        self.chain.append(new_block)
-        self.pending_transactions = []  # vacía la lista de transacciones pendientes
+
+    def mine_pending_transactions(self):
+        if len(self.pending_transactions) > 0:
+            # Convertir las transacciones pendientes a una cadena de texto
+            data = ', '.join([f"sender: {tx['sender']} recipient: {tx['recipient']} message: {tx['message']}" for tx in self.pending_transactions])
+            new_block = Block(len(self.chain), datetime.datetime.now(), data, self.get_latest_block().hash)
+            new_block.mine_block(self.difficulty)
+            self.chain.append(new_block)
+            self.pending_transactions = []
+
 
     def get_block_by_index(self, index):
         # Obtiene un bloque por su índice
@@ -117,14 +133,9 @@ def get_blocks():
 def get_block(index):
     block = blockchain.get_block_by_index(index)
     if block:
-        block_info = {
-            'index': block.index,
-            'timestamp': block.timestamp,
-            'data': block.data,
-            'previous_hash': block.previous_hash,
-            'hash': block.hash
-        }
-        return jsonify({'block': block_info})
+        block_dict = block.to_dict()
+        print("Block dictionary:", block_dict)  # Imprimir el diccionario para depurar
+        return jsonify({'block': block_dict})
     else:
         return jsonify({'message': 'Block not found'}), 404
 
@@ -148,10 +159,21 @@ def chain_status():
 @app.route('/transaction_block', methods=['POST'])
 def transaction_block():
     data = request.get_json()
-    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
-    blockchain.add_block(new_block)
-    return jsonify({'message': 'Transaction sent successfully'})
+    sender = data.get('sender')
+    recipient = data.get('recipient')
+    message = data.get('message')
+    if sender is None or recipient is None or message is None:
+        return jsonify({'message': 'Invalid transaction data'}), 400
 
+    blockchain.add_transaction(sender, recipient, message)
+    blockchain.mine_pending_transactions()  # Llama al método para minar bloques pendientes
+    return jsonify({'message': 'Transaction added successfully and block mined'}), 201
+
+
+@app.route('/mine_pending_transactions', methods=['GET'])
+def mine_pending_transactions():
+    blockchain.mine_pending_transactions()
+    return jsonify({'message': 'Pending transactions mined successfully'})
 
 
 @app.route('/diplom_block', methods=['POST'])
