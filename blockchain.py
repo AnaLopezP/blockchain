@@ -49,7 +49,8 @@ class Blockchain:
         self.chain = [self.create_genesis_block()]  # lista de bloques
         self.difficulty = 4  # dificultad para minar bloques
         self.pending_transactions = []  # transacciones pendientes
-
+        self.pending_diplomas = []
+        
     def create_genesis_block(self):
         # crea el bloque génesis
         return Block(0, datetime.datetime.now(), "Genesis Block", "0")
@@ -88,15 +89,24 @@ class Blockchain:
             'message': message
         })
 
+    def add_diploma(self, sender, recipient, diploma_name):
+        # Añade un envío de diploma pendiente a la lista
+        self.pending_diplomas.append({
+            'sender': sender,
+            'recipient': recipient,
+            'diploma_name': diploma_name
+        })
 
     def mine_pending_transactions(self):
-        if len(self.pending_transactions) > 0:
-            # Convertir las transacciones pendientes a una cadena de texto
-            data = ', '.join([f"sender: {tx['sender']} recipient: {tx['recipient']} message: {tx['message']}" for tx in self.pending_transactions])
-            new_block = Block(len(self.chain), datetime.datetime.now(), data, self.get_latest_block().hash)
+        if len(self.pending_transactions) > 0 or len(self.pending_diplomas) > 0:
+            transaction_data = ', '.join([f"Sender: {tx['sender']} Recipient: {tx['recipient']} Message: {tx['message']}" for tx in self.pending_transactions])
+            diploma_data = ', '.join([f"Sender: {d['sender']} Name diploma: {d['diploma_name']} Recipient: {d['recipient']}" for d in self.pending_diplomas])
+            combined_data = f"Transactions: {transaction_data}, Diplomas: {diploma_data}"
+            new_block = Block(len(self.chain), datetime.datetime.now(), combined_data, self.get_latest_block().hash)
             new_block.mine_block(self.difficulty)
             self.chain.append(new_block)
             self.pending_transactions = []
+            self.pending_diplomas = []
 
 
     def get_block_by_index(self, index):
@@ -180,14 +190,13 @@ def diplom_block():
     data = request.get_json()
     sender = data.get('sender')
     recipient = data.get('recipient')
-    message = data.get('message')
-    if sender is None or recipient is None or message is None:
-        return jsonify({'message': 'Invalid diplom data'}), 400
+    diploma_name = data.get('diploma_name')
+    if sender is None or recipient is None or diploma_name is None:
+        return jsonify({'message': 'Invalid diploma data'}), 400
 
-    blockchain.add_transaction(sender, recipient, message)
+    blockchain.add_diploma(sender, recipient, diploma_name)
     blockchain.mine_pending_transactions()  # Llama al método para minar bloques pendientes
-    return jsonify({'message': 'Diplom added successfully and block mined'}), 201
-
+    return jsonify({'message': 'Diploma added successfully and block mined'}), 201
 
 
 if __name__ == '__main__':

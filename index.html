@@ -103,15 +103,15 @@
     </div>
 
     <div class="container">
-        <h2>Send Diplom:</h2>
-        <form id="diplomForm">
-            <label for="sender">Sender:</label>
-            <input type="text" id="sender" name="sender" required><br>
-            <label for="recipient">Recipient:</label>
-            <input type="text" id="recipient" name="recipient" required><br>
-            <label for="message">Message:</label>
-            <input type="text" id="message" name="message" required><br>
-            <button type="submit">Send Transaction</button>
+        <h2>Send Diploma:</h2>
+        <form id="diplomaForm">
+            <label for="diplomaSender">Sender:</label>
+            <input type="text" id="diplomaSender" name="diplomaSender" required><br>
+            <label for="diplomaRecipient">Recipient:</label>
+            <input type="text" id="diplomaRecipient" name="diplomaRecipient" required><br>
+            <label for="diplomaName">Diploma Name:</label>
+            <input type="text" id="diplomaName" name="diplomaName" required><br>
+            <button type="submit">Send Diploma</button>
         </form>
     </div>
 
@@ -201,18 +201,18 @@
         });
             
             
-        document.getElementById('diplomForm').addEventListener('submit', function (event) {
+        document.getElementById('diplomaForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            const sender = document.getElementById('sender').value;
-            const recipient = document.getElementById('recipient').value;
-            const message = document.getElementById('message').value;
-        
+            const sender = document.getElementById('diplomaSender').value;
+            const recipient = document.getElementById('diplomaRecipient').value;
+            const diplomaName = document.getElementById('diplomaName').value;
+    
             // Verificar si los campos no están vacíos
-            if(sender.trim() === '' || recipient.trim() === '' || message.trim() === '') {
+            if(sender.trim() === '' || recipient.trim() === '' || diplomaName.trim() === '') {
                 alert('Please fill out all fields.');
                 return;
             }
-        
+    
             fetch('/diplom_block', {
                 method: 'POST',
                 headers: {
@@ -221,7 +221,7 @@
                 body: JSON.stringify({
                     sender: sender,
                     recipient: recipient,
-                    message: message
+                    diploma_name: diplomaName
                 })
             })
             .then(response => response.json())
