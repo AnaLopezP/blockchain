@@ -182,11 +182,11 @@ def diplom_block():
     recipient = data.get('recipient')
     message = data.get('message')
     if sender is None or recipient is None or message is None:
-        return jsonify({'message': 'Invalid transaction data'}), 400
+        return jsonify({'message': 'Invalid diplom data'}), 400
 
     blockchain.add_transaction(sender, recipient, message)
     blockchain.mine_pending_transactions()  # Llama al método para minar bloques pendientes
-    return jsonify({'message': 'Transaction added successfully and block mined'}), 201
+    return jsonify({'message': 'Diplom added successfully and block mined'}), 201
 
 
 
