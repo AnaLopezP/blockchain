@@ -83,33 +83,33 @@ class Blockchain:
 
     
     def add_transaction(self, sender, recipient, message):
-        # Validar que los campos no estén vacíos
-        if sender.strip() and recipient.strip() and message.strip():
-            self.pending_transactions.append({
-                'sender': sender,
-                'recipient': recipient,
-                'message': message
-            })
+        #añade la transacción al bloque
+        self.pending_transactions.append({
+            'sender': sender,
+            'recipient': recipient,
+            'message': message
+        })
 
     def add_diploma(self, sender, recipient, diploma_name):
-        # Validar que los campos no estén vacíos
-        if sender.strip() and recipient.strip() and diploma_name.strip():
-            self.pending_diplomas.append({
-                'sender': sender,
-                'recipient': recipient,
-                'diploma_name': diploma_name
-            })
+        #añade el diploma al bloque
+        
+        self.pending_diplomas.append({
+            'sender': sender,
+            'recipient': recipient,
+            'diploma_name': diploma_name
+        })
 
     def mine_pending_transactions(self):
-        if len(self.pending_transactions) > 0 or len(self.pending_diplomas) > 0:
-            transaction_data = ', '.join([f"Sender: {tx['sender']} Recipient: {tx['recipient']} Message: {tx['message']}" for tx in self.pending_transactions])
-            diploma_data = ', '.join([f"Sender: {d['sender']} Name diploma: {d['diploma_name']} Recipient: {d['recipient']}" for d in self.pending_diplomas])
-            combined_data = f"Transactions: {transaction_data}, Diplomas: {diploma_data}"
-            new_block = Block(len(self.chain), datetime.datetime.now(), combined_data, self.get_latest_block().hash)
-            new_block.mine_block(self.difficulty)
-            self.chain.append(new_block)
-            self.pending_transactions = []
-            self.pending_diplomas = []
+        #se encarga de minar las transacciones pendientes
+        if len(self.pending_transactions) > 0 or len(self.pending_diplomas) > 0: # Verifica si hay transacciones pendientes
+            transaction_data = ', '.join([f"Sender: {tx['sender']} Recipient: {tx['recipient']} Message: {tx['message']}" for tx in self.pending_transactions]) # Concatena las transacciones pendientes
+            diploma_data = ', '.join([f"Sender: {d['sender']} Name diploma: {d['diploma_name']} Recipient: {d['recipient']}" for d in self.pending_diplomas]) # Concatena los diplomas pendientes
+            combined_data = f"Transactions: {transaction_data}, Diplomas: {diploma_data}" # Combina las transacciones y diplomas pendientes
+            new_block = Block(len(self.chain), datetime.datetime.now(), combined_data, self.get_latest_block().hash) # Crea un nuevo bloque con las transacciones pendientes
+            new_block.mine_block(self.difficulty) # Mina el bloque
+            self.chain.append(new_block) # Añade el bloque a la cadena
+            self.pending_transactions = [] # Limpia las transacciones pendientes
+            self.pending_diplomas = [] # Limpia los diplomas pendientes
 
 
     def get_block_by_index(self, index):
@@ -122,14 +122,15 @@ class Blockchain:
 
 blockchain = Blockchain()  # crea una cadena de bloques
 
-
-@app.route('/')
+# Rutas de la API
+@app.route('/') # Ruta para la página principal
 def index():
     return render_template('index.html')
 
 
-@app.route('/blocks', methods=['GET'])
+@app.route('/blocks', methods=['GET']) # Ruta para obtener todos los bloques
 def get_blocks():
+    # Obtiene todos los bloques de la cadena y los convierte a un diccionario
     blocks = []
     for block in blockchain.chain:
         blocks.append({
@@ -142,62 +143,63 @@ def get_blocks():
     return jsonify({'blocks': blocks})
 
 
-@app.route('/block/<int:index>', methods=['GET'])
-def get_block(index):
+@app.route('/block/<int:index>', methods=['GET']) # Ruta para obtener un bloque por su índice
+def get_block(index): 
+    # Obtiene un bloque por su índice y lo convierte a un diccionario
     block = blockchain.get_block_by_index(index)
     if block:
-        block_dict = block.to_dict()
+        block_dict = block.to_dict() # Convierte el bloque a un diccionario
         print("Block dictionary:", block_dict)  # Imprimir el diccionario para depurar
         return jsonify({'block': block_dict})
     else:
-        return jsonify({'message': 'Block not found'}), 404
+        return jsonify({'message': 'Block not found'}), 404 # Devuelve un mensaje de error si no se encuentra el bloque
 
 
-@app.route('/mine_block', methods=['POST'])
+@app.route('/mine_block', methods=['POST']) # Ruta para minar un bloque
 def mine_block():
-    data = request.get_json()
-    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "")
-    blockchain.add_block(new_block)
+    data = request.get_json() # Obtiene los datos del bloque a minar
+    new_block = Block(len(blockchain.chain), datetime.datetime.now(), data['data'], "") # Crea un nuevo bloque
+    blockchain.add_block(new_block) # Añade el bloque a la cadena
     return jsonify({'message': 'Block mined successfully'})
 
 
-@app.route('/chain_status', methods=['GET'])
+@app.route('/chain_status', methods=['GET']) # Ruta para verificar el estado de la cadena
 def chain_status():
-    is_valid = blockchain.is_chain_valid()
-    status_message = "Valid" if is_valid else "Invalid"
+    is_valid = blockchain.is_chain_valid() # Verifica si la cadena es válida
+    status_message = "Valid" if is_valid else "Invalid" # Mensaje de estado
     return jsonify({'status': status_message})
 
 
 
-@app.route('/transaction_block', methods=['POST'])
+@app.route('/transaction_block', methods=['POST']) # Ruta para añadir una transacción al bloque
 def transaction_block():
-    data = request.get_json()
-    sender = data.get('sender')
-    recipient = data.get('recipient')
-    message = data.get('message')
-    if sender is None or recipient is None or message is None:
+    data = request.get_json() # Obtiene los datos de la transacción
+    sender = data.get('sender') # Obtiene el remitente
+    recipient = data.get('recipient') # Obtiene el destinatario
+    message = data.get('message') # Obtiene el mensaje
+    if sender is None or recipient is None or message is None: # Verifica
         return jsonify({'message': 'Invalid transaction data'}), 400
 
-    blockchain.add_transaction(sender, recipient, message)
+    blockchain.add_transaction(sender, recipient, message) # Añade la transacción al bloque
     blockchain.mine_pending_transactions()  # Llama al método para minar bloques pendientes
     return jsonify({'message': 'Transaction added successfully and block mined'}), 201
 
 
-@app.route('/mine_pending_transactions', methods=['GET'])
+@app.route('/mine_pending_transactions', methods=['GET']) # Ruta para minar las transacciones pendientes
 def mine_pending_transactions():
-    blockchain.mine_pending_transactions()
+    blockchain.mine_pending_transactions() # Llama al método para minar bloques pendientes
     return jsonify({'message': 'Pending transactions mined successfully'})
 
-@app.route('/diplom_block', methods=['POST'])
+@app.route('/diplom_block', methods=['POST']) # Ruta para añadir un diploma al bloque
 def diplom_block():
-    data = request.get_json()
-    sender = data.get('sender')
-    recipient = data.get('recipient')
-    diploma_name = data.get('diploma_name')
-    if sender is None or recipient is None or diploma_name is None:
+    data = request.get_json() # Obtiene los datos del diploma
+    sender = data.get('sender') # Obtiene el remitente
+    recipient = data.get('recipient') # Obtiene el destinatario
+    diploma_name = data.get('diploma_name') # Obtiene el nombre del diploma
+    if sender is None or recipient is None or diploma_name is None: # Verifica
         return jsonify({'message': 'Invalid diploma data'}), 400
 
-    blockchain.add_diploma(sender, recipient, diploma_name)
+    blockchain.add_diploma(sender, recipient, diploma_name) # Añade el diploma al bloque
     blockchain.mine_pending_transactions()  # Llama al método para minar bloques pendientes
     return jsonify({'message': 'Diploma added successfully and block mined'}), 201
 
